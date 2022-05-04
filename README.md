@@ -1,5 +1,8 @@
 # gcp-notify-slack
 
+## works on
+- Node.js v16.15.0
+
 ## deploy
 
 ```sh
