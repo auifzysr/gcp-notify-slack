@@ -8,4 +8,4 @@ RUN npm install --production
 
 COPY ./src .
 
-CMD [ "npm", "run", "pubsub" ]
+CMD [ "npm", "start" ]
