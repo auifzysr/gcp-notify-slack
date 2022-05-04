@@ -9,13 +9,10 @@ const token = process.env.SLACK_TOKEN;
 
 const web = new WebClient(token);
 
-const messageBody = "test";
-const channel = "development";
-
-(async () => {
+module.exports = (text, channel) => async () => {
   const result = await web.chat.postMessage({
-    text: messageBody,
+    text: text,
     channel: channel
   });
   console.log(result);
-})();
+};
