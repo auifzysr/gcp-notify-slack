@@ -2,6 +2,7 @@
 
 ## works on
 - Node.js v16.15.0
+- Terraform v1.1.9
 
 ## deploy
 
