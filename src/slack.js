@@ -52,24 +52,3 @@ module.exports.messageObjectComposer = (...middlewares) => {
 
   return { use, compose };
 };
-
-module.exports.isTailSectionFull = (messageObject) => {
-  if (messageObject[0].blocks == null) {
-    throw new Error('blocks field not found');
-  }
-  const tailObject = messageObject[0].blocks[messageObject[0].blocks.length - 1]
-  return tailObject.type !== "section" || tailObject.fields.length > 1
-};
-
-module.exports.setField = (fieldName) => {
-  return (rawData, messageObject, next) => {
-    messageObject.push({
-      type: "section",
-      text: {
-        type: "plain_text",
-        text: rawData[fieldName]
-      }
-    })
-    next();
-  }
-};
