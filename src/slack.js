@@ -5,32 +5,31 @@
 
 const { WebClient } = require('@slack/web-api');
 
-class Client {
+module.exports.Client = class client {
   constructor(token, channel) {
     this.client = new WebClient(token);
     this.channel = channel;
   }
 
-  async postMessage(blocks) {
+  async postMessage(text, blocks, attachments) {
     const result = await this.client.chat.postMessage({
+      text: text,
       blocks: blocks,
-      text: blocks,
+      attachments: attachments,
       channel: this.channel
     });
     console.log(result);
   }
 };
 
-module.exports.Client = Client;
-
-function blocksComposer(...middlewares) {
+module.exports.messageObjectComposer = (...middlewares) => {
   const middlewareStack = middlewares;
 
   const use = (...middlewares) => {
     middlewareStack.push(...middlewares);
   }
 
-  const compose = async (rawData, blocks) => {
+  const compose = async (rawData, messageObject) => {
     let prevIndex = -1;
     const composer = async (index) => {
       if (index === prevIndex) {
@@ -42,7 +41,7 @@ function blocksComposer(...middlewares) {
       const middleware = middlewareStack[index];
 
       if (middleware) {
-        await middleware(rawData, blocks, () => {
+        await middleware(rawData, messageObject, () => {
           return composer(index + 1);
         })
       }
@@ -54,11 +53,17 @@ function blocksComposer(...middlewares) {
   return { use, compose };
 };
 
-module.exports.blocksComposer = blocksComposer;
+module.exports.isTailSectionFull = (messageObject) => {
+  if (messageObject[0].blocks == null) {
+    throw new Error('blocks field not found');
+  }
+  const tailObject = messageObject[0].blocks[messageObject[0].blocks.length - 1]
+  return tailObject.type !== "section" || tailObject.fields.length > 1
+};
 
-const setField = (fieldName) => {
-  return (rawData, blocks, next) => {
-    blocks.push({
+module.exports.setField = (fieldName) => {
+  return (rawData, messageObject, next) => {
+    messageObject.push({
       type: "section",
       text: {
         type: "plain_text",
@@ -68,5 +73,3 @@ const setField = (fieldName) => {
     next();
   }
 };
-
-module.exports.setField = setField;
