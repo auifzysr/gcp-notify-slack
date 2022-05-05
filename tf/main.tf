@@ -38,7 +38,7 @@ resource "google_cloud_run_service" "notify-slack" {
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project_id}/${var.resource_name_prefix}"
+        image = "gcr.io/${var.project_id}/${var.resource_name_prefix}:${var.container_tag}"
         env {
           name  = "SLACK_TOKEN"
           value = var.slack_token
