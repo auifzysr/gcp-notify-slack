@@ -17,13 +17,22 @@ if (slackChannel == null) {
   process.exit(1);
 }
 
-slackClient = new slack.Client(slackToken, slackChannel);
+const slackClient = new slack.Client(slackToken, slackChannel);
 
 
 app.post('/', (req, res) => {
-  const rawMessage = Buffer.from(req.body.message.data, 'base64').toString().trim();
+  const rawMessage = JSON.parse(Buffer.from(req.body.message.data, 'base64').toString().trim());
   res.status(204).send();
-  slackClient.postMessage(rawMessage, slackChannel);
+
+  let blocks = [];
+  const composer = slack.blocksComposer((rawData, blocks, next) => {
+    next();
+  });
+  composer.use(slack.setField("dataSourceId"));
+  composer.use(slack.setField("name"));
+  composer.compose(rawMessage, blocks);
+
+  slackClient.postMessage(blocks);
 });
 
 module.exports = app;
