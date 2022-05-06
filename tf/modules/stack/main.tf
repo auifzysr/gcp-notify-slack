@@ -136,7 +136,7 @@ resource "google_cloudbuild_trigger" "notify-slack" {
     _SLACK_CHANNEL = var.slack_channel
   }
 
-  ignored_files  = ["**"]
+  #  ignored_files  = ["**"]
   included_files = ["src/**"]
 
   filename = "cloudbuild.yaml"
