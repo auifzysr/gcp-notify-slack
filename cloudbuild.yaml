@@ -19,5 +19,9 @@ steps:
   - 'gcr.io/$PROJECT_ID/notify-slack:$COMMIT_SHA'
   - '--region'
   - 'asia-northeast1'
+  - '--set-env-vars'
+  - 'SLACK_TOKEN=$_SLACK_TOKEN'
+  - '--set-env-vars'
+  - 'SLACK_CHANNEL=$_SLACK_CHANNEL'
 images:
 - 'gcr.io/$PROJECT_ID/notify-slack:$COMMIT_SHA'
