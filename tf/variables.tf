@@ -30,8 +30,3 @@ variable "slack_channel" {
   description = "Slack channel"
   type        = string
 }
-
-variable "container_tag" {
-  description = "Container tag"
-  type        = string
-}

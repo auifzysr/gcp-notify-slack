@@ -13,7 +13,7 @@ resource "google_service_account" "cloudrun_sa" {
 }
 
 resource "google_project_iam_binding" "pubsub_sa_roles_token_creator" {
-  project = var.project_id
+  project = data.google_project.project.project_id
   role    = "roles/iam.serviceAccountTokenCreator"
   members = [
     "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
@@ -38,7 +38,7 @@ resource "google_cloud_run_service" "notify-slack" {
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project_id}/${var.resource_name_prefix}:${var.container_tag}"
+        image = "gcr.io/${data.google_project.project.project_id}/${var.resource_name_prefix}:init"
         env {
           name  = "SLACK_TOKEN"
           value = var.slack_token
@@ -70,7 +70,7 @@ resource "google_cloud_run_service" "notify-slack" {
 
 resource "google_cloud_run_service_iam_binding" "cloudrun_sa_roles_invoker" {
   location = var.region
-  project  = var.project_id
+  project  = data.google_project.project.project_id
   role     = "roles/run.invoker"
   service  = google_cloud_run_service.notify-slack.name
   members = [
@@ -112,4 +112,20 @@ resource "google_pubsub_subscription_iam_member" "push_auth" {
   depends_on = [
     google_pubsub_subscription.notify-slack,
   ]
+}
+
+resource "google_cloudbuild_trigger" "notify-slack" {
+  name        = var.resource_name_prefix
+  description = "build and deploy ${var.resource_name_prefix}"
+  trigger_template {
+    branch_name = ".*"
+    repo_name   = "gcp-notify-slack"
+  }
+
+  substitutions = {
+    _SLACK_TOKEN   = var.slack_token
+    _SLACK_CHANNEL = var.slack_channel
+  }
+
+  filename = "cloudbuild.yaml"
 }
