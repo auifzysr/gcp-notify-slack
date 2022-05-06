@@ -15,6 +15,11 @@ variable "project_id" {
   type        = string
 }
 
+variable "env" {
+  description = "Environment"
+  type        = string
+}
+
 variable "resource_name_prefix" {
   description = "Resource name prefix"
   type        = string

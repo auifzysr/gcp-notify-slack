@@ -127,7 +127,7 @@ resource "google_cloudbuild_trigger" "notify-slack" {
   name        = var.resource_name_prefix
   description = "build and deploy ${var.resource_name_prefix}"
   trigger_template {
-    branch_name = ".*"
+    branch_name = var.env
     repo_name   = "gcp-notify-slack"
   }
 
