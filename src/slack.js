@@ -2,6 +2,7 @@
 // - get bot token scope
 // - grant chat:write to the scope
 // - specify the token formatted like xoxb-...
+// 
 
 const { WebClient } = require('@slack/web-api');
 
