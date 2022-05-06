@@ -55,12 +55,21 @@ resource "google_cloud_run_service" "notify-slack" {
         }
       }
       container_concurrency = 1
+      timeout_seconds       = 60
     }
   }
+
+  autogenerate_revision_name = true
 
   traffic {
     percent         = 100
     latest_revision = true
+  }
+
+  timeouts {
+    create = "2m"
+    update = "2m"
+    delete = "2m"
   }
 
   depends_on = [
