@@ -19,7 +19,7 @@ if (slackChannel == null) {
   process.exit(1);
 }
 
-const slackClient = new slack.Client(slackToken, slackChannel);
+slack.initClient(slackToken, slackChannel);
 
 const composer = slack.messageObjectComposer(middleware.setHeader("#ff0000", "some header"));
 composer.use(middleware.addField("state"));
@@ -37,7 +37,7 @@ app.post('/', (req, res) => {
 
   let attachments = []
   composer.compose(rawMessage, attachments);
-  slackClient.postMessage(null, null, attachments);
+  slack.postMessage(null, null, attachments);
 });
 
 module.exports = app;

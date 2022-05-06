@@ -6,21 +6,30 @@
 
 const { WebClient } = require('@slack/web-api');
 
-module.exports.Client = class client {
-  constructor(token, channel) {
-    this.client = new WebClient(token);
-    this.channel = channel;
-  }
+let client;
+let channel;
+module.exports.initClient = (() => {
+  var initialized = false;
+  return (_token, _channel) => {
+    if (!initialized) {
+      initialized = true;
+      client = new WebClient(_token);
+      channel = _channel;
+    }
+  };
+})();
 
-  async postMessage(text, blocks, attachments) {
-    const result = await this.client.chat.postMessage({
-      text: text,
-      blocks: blocks,
-      attachments: attachments,
-      channel: this.channel
-    });
-    console.log(result);
+module.exports.postMessage = (text, blocks, attachments) => {
+  if (client == null) {
+    throw new Error('client is not initialized yet');
   }
+  const result = client.chat.postMessage({
+    text: text,
+    blocks: blocks,
+    attachments: attachments,
+    channel: channel
+  });
+  result.finally(() => console.log(result));
 };
 
 module.exports.messageObjectComposer = (...middlewares) => {
