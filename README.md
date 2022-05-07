@@ -24,5 +24,6 @@ docker push gcr.io/PROJECT_ID/notify-slack:init
 # deploy CD pipeline
 cd tf
 terraform init
-terraform apply -var project_id=PROJECT_ID -var slack_channel=SLACK_CHANNEL -var slack_token=SLACK_TOKEN
+terraform plan -var-file=terraform.tfvars
+terraform apply -var-file=terraform.tfvars
 ```
