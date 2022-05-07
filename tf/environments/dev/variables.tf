@@ -18,7 +18,7 @@ variable "project_id" {
 variable "resource_name_prefix" {
   description = "Resource name prefix"
   type        = string
-  default     = "notify-slack"
+  default     = "pubsub-slack"
 }
 
 variable "slack_token" {

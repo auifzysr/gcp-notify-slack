@@ -28,7 +28,7 @@ resource "google_project_iam_binding" "pubsub_sa_roles_token_creator" {
   ]
 }
 
-resource "google_cloud_run_service" "notify-slack" {
+resource "google_cloud_run_service" "pubsub-slack" {
   name     = local.resource_name
   location = var.region
 
@@ -85,54 +85,54 @@ resource "google_cloud_run_service_iam_binding" "cloudrun_sa_roles_invoker" {
   location = var.region
   project  = data.google_project.project.project_id
   role     = "roles/run.invoker"
-  service  = google_cloud_run_service.notify-slack.name
+  service  = google_cloud_run_service.pubsub-slack.name
   members = [
     "serviceAccount:${google_service_account.cloudrun_sa.email}"
   ]
 
   depends_on = [
-    google_cloud_run_service.notify-slack,
+    google_cloud_run_service.pubsub-slack,
   ]
 }
 
-resource "google_pubsub_topic" "notify-slack" {
+resource "google_pubsub_topic" "pubsub-slack" {
   name = local.resource_name
 }
 
-resource "google_pubsub_subscription" "notify-slack" {
+resource "google_pubsub_subscription" "pubsub-slack" {
   name  = local.resource_name
-  topic = google_pubsub_topic.notify-slack.name
+  topic = google_pubsub_topic.pubsub-slack.name
 
   ack_deadline_seconds = 600
   push_config {
     oidc_token {
       service_account_email = google_service_account.cloudrun_sa.email
     }
-    push_endpoint = google_cloud_run_service.notify-slack.status[0].url
+    push_endpoint = google_cloud_run_service.pubsub-slack.status[0].url
   }
 
   depends_on = [
-    google_pubsub_topic.notify-slack,
+    google_pubsub_topic.pubsub-slack,
     google_project_iam_binding.pubsub_sa_roles_token_creator,
   ]
 }
 
 resource "google_pubsub_subscription_iam_member" "push_auth" {
-  subscription = google_pubsub_subscription.notify-slack.name
+  subscription = google_pubsub_subscription.pubsub-slack.name
   role         = "roles/editor"
   member       = "serviceAccount:${google_service_account.cloudrun_sa.email}"
 
   depends_on = [
-    google_pubsub_subscription.notify-slack,
+    google_pubsub_subscription.pubsub-slack,
   ]
 }
 
-resource "google_cloudbuild_trigger" "notify-slack" {
+resource "google_cloudbuild_trigger" "pubsub-slack" {
   name        = local.resource_name
   description = "build and deploy ${local.resource_name}"
   trigger_template {
     branch_name = var.env
-    repo_name   = "gcp-notify-slack"
+    repo_name   = "gcp-pubsub-slack"
   }
 
   substitutions = {

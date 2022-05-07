@@ -1,5 +1,5 @@
 {
-  "name": "gcp-notify-slack",
+  "name": "gcp-pubsub-slack",
   "version": "0.0.1",
   "description": "",
   "main": "app.js",
