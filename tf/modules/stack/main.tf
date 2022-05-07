@@ -7,9 +7,13 @@ provider "google" {
 data "google_project" "project" {
 }
 
+locals {
+  resource_name = "${var.resource_name_prefix}-${var.env}"
+}
+
 resource "google_service_account" "cloudrun_sa" {
-  account_id   = var.resource_name_prefix
-  display_name = var.resource_name_prefix
+  account_id   = local.resource_name
+  display_name = local.resource_name
 }
 
 resource "google_project_iam_binding" "pubsub_sa_roles_token_creator" {
@@ -25,7 +29,7 @@ resource "google_project_iam_binding" "pubsub_sa_roles_token_creator" {
 }
 
 resource "google_cloud_run_service" "notify-slack" {
-  name     = var.resource_name_prefix
+  name     = local.resource_name
   location = var.region
 
   metadata {
@@ -38,7 +42,7 @@ resource "google_cloud_run_service" "notify-slack" {
   template {
     spec {
       containers {
-        image = "gcr.io/${data.google_project.project.project_id}/${var.resource_name_prefix}:init"
+        image = "gcr.io/${data.google_project.project.project_id}/${local.resource_name}:init"
         env {
           name  = "SLACK_TOKEN"
           value = var.slack_token
@@ -92,11 +96,11 @@ resource "google_cloud_run_service_iam_binding" "cloudrun_sa_roles_invoker" {
 }
 
 resource "google_pubsub_topic" "notify-slack" {
-  name = var.resource_name_prefix
+  name = local.resource_name
 }
 
 resource "google_pubsub_subscription" "notify-slack" {
-  name  = var.resource_name_prefix
+  name  = local.resource_name
   topic = google_pubsub_topic.notify-slack.name
 
   ack_deadline_seconds = 600
@@ -124,8 +128,8 @@ resource "google_pubsub_subscription_iam_member" "push_auth" {
 }
 
 resource "google_cloudbuild_trigger" "notify-slack" {
-  name        = var.resource_name_prefix
-  description = "build and deploy ${var.resource_name_prefix}"
+  name        = local.resource_name
+  description = "build and deploy ${local.resource_name}"
   trigger_template {
     branch_name = var.env
     repo_name   = "gcp-notify-slack"
