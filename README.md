@@ -16,10 +16,10 @@ gcloud source repos create gcp-slack-notify
 git remote add csr ssh://USER_EMAIL@source.developers.google.com:2022/p/PROJECT_ID/r/gcp-notify-slack
 git push csr main
 
-# build initial docker image
+# build initial docker image (dev)
 gcloud auth configure-docker
-docker build -t gcr.io/PROJECT_ID/notify-slack:init .
-docker push gcr.io/PROJECT_ID/notify-slack:init
+docker build -t gcr.io/PROJECT_ID/notify-slack-dev:init .
+docker push gcr.io/PROJECT_ID/notify-slack-dev:init
 
 # deploy CD pipeline
 cd tf
